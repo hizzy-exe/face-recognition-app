@@ -37,3 +37,7 @@ python face-recognition-api/client.py
 1. Drop a clear, front-facing photo of yourself right into the `face-recognition-api` directory and make sure it’s named exactly `reference.JPG`.
 2. Spin up the stack using the commands above and look directly at your camera lens.
 3. The client script will start hammering the API with frame buffers, dynamically painting a green `MATCH!` overlay across your face if the facial distance metrics check out, or a red `NO MATCH` box if the camera is pointing at a wall or a different person.
+
+## This Was My First Time Creating An API
+
+## Enjoy
