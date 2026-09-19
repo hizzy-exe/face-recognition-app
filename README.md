@@ -1,43 +1,29 @@
-# Face Recognition App (Because Windows and ML Libraries Hate Each Other)
 
-Look, if you’ve ever tried installing deep learning libraries natively on Windows, you already know it’s an absolute nightmare. Between the C++ compiler errors, `dlib` failing to build, and Python version mismatches, it’s just not worth the headache. So instead of wrestling with system paths and breaking my local machine, I did the sensible thing and shoved the entire DeepFace engine inside a Docker container so it works instantly without touching my actual OS.
+---
 
-Basically, this project uses a decoupled setup. The heavy lifting happens inside an isolated Linux image running a Flask API, while my local machine just runs a lightweight webcam script that pushes video frames over a network loop. It looks sophisticated to recruiters, but honestly, it was just the easiest way to bypass a massive setup headache.
+### 2. Professional rewrite of `face-recognition-app/README.md`
 
-## How the Pieces Fit Together
+```markdown
+# Face Recognition Application
 
-The architecture is pretty straightforward, mostly because I didn't want to overcomplicate it:
+A containerized face verification system that runs facial recognition inference inside a Docker environment and streams webcam frames from the host for real-time matching.
 
-*   **The Backend (`face-recognition-api/`):** A Flask server packed with DeepFace and TensorFlow running on a stable Python 3.10 Linux image. It takes incoming images, runs them against a reference portrait using the VGG-Face model, and spits back a quick verification response.
-*   **The Client (`client.py`):** A lightweight script running on the host machine that grabs webcam frames using OpenCV, packs them into HTTP POST requests, and streams them directly to the container. 
+The solution isolates heavy machine learning dependencies (DeepFace + TensorFlow) in a Linux container while keeping the client lightweight. This design avoids common Windows-native installation issues with deep learning libraries and provides a clean separation between inference and capture.
 
-This means your host computer doesn’t get bogged down compiling heavy machine learning graphs locally—the container handles the grind.
+## Architecture
 
-## Launching the Stack
+- **Backend** (`face-recognition-api/`): Flask API running DeepFace with the VGG-Face model inside a Docker container. Accepts image frames and returns verification results against a reference image.
+- **Client** (`face-recognition-api/client.py`): Lightweight host-side script that captures webcam frames with OpenCV and posts them to the API.
+- **Orchestration**: Docker Compose for single-command startup.
 
-### 1. Booting the Infrastructure
-Instead of typing out long terminal strings with a dozen parameter flags, I threw together a Docker Compose config so you can spin up the entire pipeline with a single command:
+## Prerequisites
 
-```bash
-docker compose up --build
-```
+- Docker and Docker Compose
+- Python 3.8+ on the host (for the client script only)
+- A clear, front-facing reference image named `reference.JPG` placed in the `face-recognition-api/` directory
 
-*(Just a heads up: the first time you run this, the terminal is going to look completely frozen for about a minute. Don't panic or close it, it's just pulling down the massive pre-trained VGG-Face weights file from the cloud. Once it finishes, the server logs will activate.)*
+## Quick Start
 
-### 2. Starting the Webcam Stream
-Once the container logs say the server is active on port 5000, open up a completely separate terminal tab (so we don't mess up the active backend stream) and launch the capture pipeline:
-
-```bash
-pip install opencv-python requests
-python face-recognition-api/client.py
-```
-
-## Making It Actually Work
-
-1. Drop a clear, front-facing photo of yourself right into the `face-recognition-api` directory and make sure it’s named exactly `reference.JPG`.
-2. Spin up the stack using the commands above and look directly at your camera lens.
-3. The client script will start hammering the API with frame buffers, dynamically painting a green `MATCH!` overlay across your face if the facial distance metrics check out, or a red `NO MATCH` box if the camera is pointing at a wall or a different person.
-
-## This Was My First Time Creating An API
-
-## Enjoy
+1. Build and start the inference service:
+   ```bash
+   docker compose up --build
