@@ -1,7 +1,4 @@
-
----
-
-### 2. Professional rewrite of `face-recognition-app/README.md`
+Professional rewrite of `face-recognition-app/README.md`
 
 ```markdown
 # Face Recognition Application
@@ -27,3 +24,28 @@ The solution isolates heavy machine learning dependencies (DeepFace + TensorFlow
 1. Build and start the inference service:
    ```bash
    docker compose up --build
+   The first run downloads the VGG-Face model weights and may take one to two minutes.
+
+2. In a separate terminal, install client dependencies and start the webcam stream:
+   pip install opencv-python requests
+   python face-recognition-api/client.py
+
+3. Position yourself in front of the camera. The client displays a green MATCH overlay when      the face matches the reference image, or a red NO MATCH overlay otherwise.
+
+
+## Project Structure
+
+face-recognition-app/
+├── docker-compose.yml
+├── face-recognition-api/
+│   ├── Dockerfile
+│   ├── app.py              # Flask inference server
+│   ├── client.py           # Host-side webcam client
+│   ├── requirements.txt
+│   └── reference.JPG       # Reference image (user-provided)
+└── README.md
+
+## Notes
+
+The API is bound to 127.0.0.1:5000 by default for local use.
+This project demonstrates a practical approach to packaging computer vision workloads with Docker and exposing them via a simple HTTP API.
