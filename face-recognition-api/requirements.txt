@@ -2,3 +2,6 @@ flask
 opencv-python-headless
 deepface
 tf-keras
+gradio
+requests
+numpy
