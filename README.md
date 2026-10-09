@@ -1,42 +1,60 @@
 # Face Recognition Application
 
-A containerized face verification system that runs facial recognition inference inside a Docker environment and streams webcam frames from the host for real-time matching.
+Containerized face enrollment and verification system using DeepFace, Flask, and Gradio.
 
-The solution isolates heavy machine learning dependencies (DeepFace + TensorFlow) in a Linux container while keeping the client lightweight. This design avoids common Windows-native installation issues with deep learning libraries and provides a clean separation between inference and capture.
+Users enroll a face by uploading a photo, then verify later uploads against the enrolled face. Face detection runs first; DeepFace is only called when a face is present.
+
+## Features
+
+- No hardcoded reference image required
+- `/enroll` endpoint to register a face
+- `/verify` endpoint to compare against the enrolled face
+- Face detection gate before verification
+- Gradio UI with drag-and-drop upload
 
 ## Architecture
 
-- Backend (face-recognition-api/): Flask API running DeepFace with the VGG-Face model inside a Docker container. Accepts image frames and returns verification results against a reference image.
-- Client (face-recognition-api/client.py): Lightweight host-side script that captures webcam frames with OpenCV and posts them to the API.
-- Orchestration: Docker Compose for single-command startup.
+- **API** (`app.py`): Flask service for enroll + verify
+- **UI** (`gradio_app.py`): Gradio frontend for uploads
+- **Model**: DeepFace with VGG-Face
+- **Packaging**: Docker Compos
 
 ## Prerequisites
 
 - Docker and Docker Compose
 - Python 3.8+ on the host (for the client script only)
-- A clear, front-facing reference image named reference.JPG placed in the face-recognition-api/ directory
 
 ## Quick Start
 
-**1. Build and start the inference service**
+### Option A: Docker Compose
 
 docker compose up --build
-The first run downloads the VGG-Face model weights and may take one to two minutes.
 
+API: http://localhost:5000
+UI: http://localhost:7860
 
-**2. Start the webcam client**
+### Option B: Local
 
-Open a new terminal and run:
-pip install opencv-python requests
-python face-recognition-api/client.py
+cd face-recognition-api
+pip install -r requirements.txt
+python app.py
 
+In another terminal:
+python gradio_app.py
 
-**3. Use the application**
+Open http://localhost:7860
 
-- Place a clear front-facing photo named reference.JPG in the face-recognition-api/ folder
-- Look at the camera
-- The client will show a green MATCH overlay when the face matches, or a red NO MATCH overlay when it does not
+## Usage
 
+Open the Enroll tab and upload a clear face photo
+Open the Verify tab and upload another photo
+View match / no match result
+
+## API
+
+POST /enroll — form-data field image
+POST /verify — form-data field image
+GET /status — whether a face is enrolled
 
 ## Project Structure
 
@@ -44,12 +62,10 @@ face-recognition-app/
 ├── docker-compose.yml
 ├── face-recognition-api/
 │   ├── Dockerfile
-│   ├── app.py              # Flask inference server
-│   ├── client.py           # Host-side webcam client
-│   ├── requirements.txt
-│   └── reference.JPG       # Reference image (user-provided)
+│   ├── app.py
+│   ├── gradio_app.py
+│   └── requirements.txt
 └── README.md
-
 
 ## Notes
 
@@ -59,7 +75,25 @@ face-recognition-app/
 ## License
 
 This project is provided for educational and portfolio purposes.
-## Notes
 
-The API is bound to 127.0.0.1:5000 by default for local use.
-This project demonstrates a practical approach to packaging computer vision workloads with Docker and exposing them via a simple HTTP API.
+---
+
+## How to push (recruiter-friendly)
+
+from bash:
+# from repo root
+git add face-recognition-api/app.py
+git commit -m "Add /enroll endpoint and remove hardcoded reference image"
+
+git add face-recognition-api/gradio_app.py face-recognition-api/requirements.txt
+git commit -m "Replace OpenCV client with Gradio upload UI"
+
+git add face-recognition-api/Dockerfile docker-compose.yml
+git commit -m "Update Docker setup for API and Gradio services"
+
+git add README.md
+git commit -m "Update README for enroll/verify flow"
+
+git push
+
+
