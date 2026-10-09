@@ -1,13 +1,23 @@
 version: '3.8'
 
 services:
-  face-api:
-    build:
-      context: ./face-recognition-api
-      dockerfile: Dockerfile
-    container_name: face_recognition_service
+  api:
+    build: ./face-recognition-api
     ports:
-      - "127.0.0.1:5000:5000"
+      - "5000:5000"
+    volumes:
+      - enrolled_data:/workspace
+    command: python app.py
+
+  ui:
+    build: ./face-recognition-api
+    ports:
+      - "7860:7860"
+    depends_on:
+      - api
+    command: python gradio_app.py
     environment:
-      - TF_ENABLE_ONEDNN_OPTS=0
-    restart: unless-stopped
+      - API_BASE=http://api:5000
+
+volumes:
+  enrolled_data:
