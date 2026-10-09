@@ -76,24 +76,10 @@ face-recognition-app/
 
 This project is provided for educational and portfolio purposes.
 
----
+###  Make sure Gradio file exists and is tracked
+If 'face-recognition-api/gradio_app.py' exists locally:
 
-## How to push (recruiter-friendly)
-
-from bash:
-# from repo root
-git add face-recognition-api/app.py
-git commit -m "Add /enroll endpoint and remove hardcoded reference image"
-
-git add face-recognition-api/gradio_app.py face-recognition-api/requirements.txt
-git commit -m "Replace OpenCV client with Gradio upload UI"
-
-git add face-recognition-api/Dockerfile docker-compose.yml
-git commit -m "Update Docker setup for API and Gradio services"
-
-git add README.md
-git commit -m "Update README for enroll/verify flow"
-
-git push
+'''bash
+git add face-recognition-api/gradio_app.py
 
 
